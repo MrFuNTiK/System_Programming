@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#PACK_NOT_FOUND="No matches found."
 echo ""
 echo ""
 echo "Developer: Kirill Voevodin, TUSUR, Gr. 736-1"
@@ -15,14 +14,13 @@ echo ""
 PACK_NOT_FOUND=""
 contin="y"
 
-while  : #[ "$contin"="Y" ] || [ "$contin"="y" ]
+while  : 
 do
-        #echo "$contin"
         echo "Enter package name"
         read package
         echo ""
         if
-                found_package=$(yum list installed | grep $package| tr : "\n" | head -1)#formatin list of found and get first pack in list
+                found_package=$(yum list installed $package 2>/dev/null)
         then
                 yum info $found_package
                 echo ""
@@ -31,8 +29,6 @@ do
                 echo "Find in repo..."
                 echo ""
                 result=$(yum search $package)
-                #echo ""
-                #echo "$result"
                 if [ "$result" != "$PACK_NOT_FOUND" ]
                 then
                         echo "Package found!"
@@ -57,6 +53,5 @@ do
                         "N" | "n" ) echo ""; echo "Good bye!"; exit 0;;
                         * ) echo "Error input! Try again" 1>&2;;
                 esac
-                #echo "$contin"
         done
 done
