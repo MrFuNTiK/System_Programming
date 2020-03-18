@@ -1,5 +1,5 @@
 #!/bin/bash
-#PACK_NOT_FOUND="No matches found."
+
 echo ""
 echo ""
 echo "Developer: Kirill Voevodin, TUSUR, Gr. 736-1"
