@@ -28,8 +28,8 @@ do
                 echo "Package is not installed." 1>&2
                 echo "Find in repo..."
                 echo ""
-                result=$(yum search $package)
-                if [ "$result" != "$PACK_NOT_FOUND" ]
+                result=$(yum search $package | grep -c "Name Exactly Matched")
+                if [ $result == 1 ]
                 then
                         echo "Package found!"
                         echo "Do you want to install it? ([y]es \ [n]o)"
@@ -42,6 +42,10 @@ do
                                         * ) echo "Error input! Try again" 1>&2;;
                                 esac
                         done
+                else
+                        echo "Package not found in repo"
+                        echo ""
+                        #break
                 fi
         fi
         while :
@@ -50,7 +54,7 @@ do
                 read contin
                 case "$contin" in
                         "Y" | "y" ) echo ""; echo "Another loop"; echo""; break;;
-                        "N" | "n" ) echo ""; echo "Good bye!"; exit 0;;
+                        "N" | "n" ) echo ""; echo "Good bye!"; exit $?;;
                         * ) echo "Error input! Try again" 1>&2;;
                 esac
         done
