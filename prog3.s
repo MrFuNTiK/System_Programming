@@ -31,8 +31,6 @@
     mov $str, %ebp #адрес строки в ebp
     add $25, %ebp #смещаемся в конец строки
 
-    #mov $40, %cx
-
     convert:
         mov $10, %ebx #основание системы счисления в ebx
         xor %edx, %edx #чистим edx, сюда будет писаться остаток от деления
@@ -42,8 +40,6 @@
         sub $1, %ebp #смещаемся на один символ влево по строке
         cmpw $0, %ax
         je print_and_exit
-
-
     loop convert
 
     print_and_exit:
@@ -51,7 +47,6 @@
         mov $1, %ebx
         mov $str, %ecx
         mov $41, %edx
-
         int $0x80
 
         mov $1, %eax
