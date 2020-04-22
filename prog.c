@@ -56,5 +56,7 @@ int main()
     );
     printf("%u", sum);
     printf("\n");
+	free(first_array);
+	free(ssecond_array);
     return 0;
 }
