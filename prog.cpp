@@ -14,9 +14,9 @@ int main()
 	unsigned int length = 10, ammount, low, high, last;
 	pid_t pid = getpid();
 	int rv;
+	std::cout << "PARENT:\nMy pid: " << pid << "\n";
 	std::cout << "Enter low and high bound\n";
 	std::cin >> low >> high;
-	std::cout << "PARENT:\nMy pid: " << pid << "\n";
 
 
 	ammount = (high - low) / length;
@@ -28,6 +28,8 @@ int main()
 	{
 		unsigned int first = i * length + low;
 		unsigned int second = i * length + low + length - 1;
+		if (second > high)
+			second = high;
 		std::cout << "\nPARENT:\n" << "Trying to start child number " << i+1 << "\n";
 		switch (pid = fork())
 		{
@@ -36,7 +38,7 @@ int main()
 				exit(1);
 			case 0:
 				//child_pid = getpid();	
-				std::cout << "Success!\n";
+				std::cout << "Success!\n\n";
 				//std::cout << first_p << " " << second_p << "\n";
 				execl("FindPlain", "FindPlain", std::to_string(first).c_str(), std::to_string(second).c_str(), (char*)NULL);
 				exit(rv);
@@ -46,5 +48,6 @@ int main()
 				std::cout << "Child number " << i+1 << " terminated wth status " << rv << "\n";
 		}
 	}
+	printf("That is all. I am exiting\n");
     return 0;
 }

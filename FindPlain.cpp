@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 
 typedef struct node
 {
@@ -53,6 +54,10 @@ int append(list* lst, int value)
 
 void print(list *lst)
 {
+	if ((*lst) == NULL)
+	{
+		printf ("No values\n");
+	}
 	while((*lst)!=NULL)
         {
 		printf("%d", (*lst)->data);
@@ -60,6 +65,21 @@ void print(list *lst)
 		lst=&((*lst)->next);
         }
 	printf("\n");
+}
+
+int destroy(list *root)
+{   
+	list x,y;
+	x=*root;
+	y=*root;
+	while (x!=NULL)
+	{
+		y=x->next;
+		free(x);
+		x=y;
+	}
+	*root=NULL;
+	return 1;
 }
 
 void findPlains(int low, int high)
@@ -102,6 +122,7 @@ int main(int argc, char* argv[])
 {
 	int low = to_int(argv[1]);
     int high = to_int(argv[2]);
+	double start;
 	//std::cout << argv[1] << " " << argv[2];
 	pid_t pid = getpid(), parent_pid = getppid();
 	std::cout << "    CHILD:\n";
@@ -112,5 +133,9 @@ int main(int argc, char* argv[])
 	findPlains(low, high);
 	printf("    ");
 	print(&head);
+	printf("\n");
+	destroy(&head);
+	printf("    Process will be terminated in 5 seconds\n\n");
+	sleep(5);
     return 0;
 }
