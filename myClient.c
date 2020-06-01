@@ -8,6 +8,7 @@
 #include <netdb.h>
 #include <pthread.h>
 
+pthread_mutex_t print_mutex;
 
 void error(const char *msg)
 {
@@ -26,13 +27,17 @@ void *thread_listen_funk(void *arguments)
     args_t *args = (args_t *)arguments;
     int sockfd = args->sock;
     char *buffer = args->buf;
+    char save[256];
     while (1)
     {
         int m = recv(sockfd, buffer, 255, 0); //получаем
+        bcopy(&buffer[0], &save[0], 256);//сохраняем в другое место, чтобы в буфер уже можно было писать
+        bzero(buffer, 256);
         if (m < 0)
             error("ERROR reading from socket");
-        printf("%s\n", buffer);
-        bzero(buffer, 256);
+        pthread_mutex_lock(&print_mutex);
+        printf("%s\n", save);
+        pthread_mutex_unlock(&print_mutex);
     }
 }
 
@@ -44,6 +49,8 @@ int main(int argc, char *argv[])
 
     pthread_t listen_tid;
     int status;
+
+    pthread_mutex_init(&print_mutex, NULL);
 
     char buffer[256];
     if (argc < 3)
@@ -66,7 +73,7 @@ int main(int argc, char *argv[])
     bzero((char *)&serv_addr, sizeof(serv_addr));                                        //чистим структуру адреса сервера
     serv_addr.sin_family = AF_INET;                                                      //указываем домен
     bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length); //копируем область памяти длиной serv->len по первому адресу во второй адрес
-    serv_addr.sin_port = htons(portno);                                                  //узловой порядок байт в сетевой (хз)
+    serv_addr.sin_port = htons(portno);                                                  //узловой порядок байт в сетевой
     if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)           //подключаемся к серверу
         error("ERROR connecting");
 
@@ -84,11 +91,13 @@ int main(int argc, char *argv[])
         {
         case 1:
         {
+            pthread_mutex_lock(&print_mutex);
             printf("Please enter the message: ");
             bzero(buffer, 256); //очищаем буфер
             scanf("%c", buffer);
             fgets(buffer, 255, stdin);        //заполняем буфер из stdin
             n = send(sockfd, buffer, 255, 0); //отправляем
+            pthread_mutex_unlock(&print_mutex);
             if (n < 0)
                 error("ERROR writing to socket");
             bzero(buffer, 256);
@@ -97,6 +106,7 @@ int main(int argc, char *argv[])
         case 0:
             free(args);
             close(sockfd);
+            pthread_mutexattr_destroy(&print_mutex);
             return 0;
         default:
             printf("Try again\n");
